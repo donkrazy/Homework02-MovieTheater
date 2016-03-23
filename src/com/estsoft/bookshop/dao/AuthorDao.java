@@ -12,12 +12,9 @@ import java.util.List;
 import com.estsoft.bookshop.vo.AuthorVo;
 
 public class AuthorDao {
-	public List<AuthorVo> getList() {
-		List<AuthorVo> list = new ArrayList<AuthorVo>();
-		
+	
+	private Connection getConnection() throws SQLException {
 		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
 		try {
 			//1. 드라이버 로드
 			Class.forName( "com.mysql.jdbc.Driver" );
@@ -25,6 +22,22 @@ public class AuthorDao {
 			//2. Connection 얻기
 			String url = "jdbc:mysql://localhost/webdb";
 			conn = DriverManager.getConnection(url, "webdb", "webdb");
+			
+		} catch (ClassNotFoundException ex) {
+			System.out.println( "드라이버를 찾을 수 없습니다:" + ex );
+		} 
+		
+		return conn;
+	}
+	
+	public List<AuthorVo> getList() {
+		List<AuthorVo> list = new ArrayList<AuthorVo>();
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = getConnection();
 			
 			//3. Statement 생성
 			stmt = conn.createStatement();
@@ -44,8 +57,6 @@ public class AuthorDao {
 				
 				list.add( authorVo );
 			}
-		} catch (ClassNotFoundException ex) {
-			System.out.println( "드라이버를 찾을 수 없습니다:" + ex );
 		} catch( SQLException ex ) {
 			System.out.println( "SQL 오류:" + ex );
 		} finally {
@@ -63,7 +74,6 @@ public class AuthorDao {
 				ex.printStackTrace();
 			}
 		}
-
 		return list;
 	}
 	
@@ -71,12 +81,7 @@ public class AuthorDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			//1. 드라이버 로드
-			Class.forName( "com.mysql.jdbc.Driver" );
-
-			//2. Connection 얻기
-			String url = "jdbc:mysql://localhost/webdb";
-			conn = DriverManager.getConnection(url, "webdb", "webdb");
+			conn = getConnection();
 			
 			//3. Statement 준비
 			String sql = "insert into author values(  null, ? )";
@@ -88,8 +93,6 @@ public class AuthorDao {
 			//5. SQL 실행
 			pstmt.executeUpdate();
 			
-		} catch (ClassNotFoundException ex) {
-			System.out.println( "드라이버를 찾을 수 없습니다:" + ex );
 		} catch( SQLException ex ) {
 			System.out.println( "SQL 오류:" + ex );
 		} finally {

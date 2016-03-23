@@ -26,9 +26,22 @@ public class AuthorDaoTest {
 	
 	public static void insertTest(){
 		AuthorVo authorVo = new AuthorVo();
-		authorVo.setName( "스테파니메이어" );
 		
 		AuthorDao authorDao = new AuthorDao();
+
+//		authorVo.setName( "스테파니메이어" );
+//		authorDao.insert( authorVo );
+
+		authorVo.setName( "조정래" );
+		authorDao.insert( authorVo );
+
+		authorVo.setName( "김동인" );
+		authorDao.insert( authorVo );
+
+		authorVo.setName( "김난도" );
+		authorDao.insert( authorVo );
+
+		authorVo.setName( "천상병" );
 		authorDao.insert( authorVo );
 	}
 }
