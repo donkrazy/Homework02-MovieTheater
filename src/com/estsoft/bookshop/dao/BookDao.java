@@ -1,4 +1,4 @@
-package com.estsoft.movieTheater.dao;
+package com.estsoft.bookshop.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,9 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.estsoft.movieTheater.vo.MovieVO;
+import com.estsoft.bookshop.vo.BookVo;
 
-public class MovieDao {
+public class BookDao {
 	
 	private Connection getConnection() throws SQLException {
 		Connection conn = null;
@@ -30,15 +30,18 @@ public class MovieDao {
 		return conn;
 	}
 	
-	public void updateState( MovieVO movieVO ) {
+	public void updateState( BookVo bookVo ) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = getConnection();
-			String sql = "UPDATE movie SET seats_left = ? WHERE no = ?";
+			
+			String sql = "UPDATE book SET state = ? WHERE no = ?";
 			pstmt = conn.prepareStatement( sql );
-			pstmt.setInt( 1, movieVO.getSeats_left() );
-			pstmt.setInt( 2, movieVO.getId() );
+			
+			pstmt.setString( 1, bookVo.getState() );
+			pstmt.setLong( 2, bookVo.getNo() );
+			
 			pstmt.executeUpdate();
 		} catch( SQLException ex ) {
 			System.out.println( "error:" + ex );
@@ -57,18 +60,19 @@ public class MovieDao {
 		}	
 	}
 	
-	public void insert( MovieVO movieVO ) {
+	public void insert( BookVo bookVo ) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = getConnection();
 			
 			//3. Statement 준비
-			String sql = "insert into movie values(  null, ?, 200 )";
+			String sql = "insert into book values(  null, ?, 'available', ? )";
 			pstmt = conn.prepareStatement(sql);
 			
 			//4. bind
-			pstmt.setString( 1, movieVO.getTitle() );
+			pstmt.setString( 1, bookVo.getTitle() );
+			pstmt.setLong( 2, bookVo.getAuthorNo() );
 			
 			//5. SQL 실행
 			pstmt.executeUpdate();
@@ -90,8 +94,8 @@ public class MovieDao {
 		}		
 	}
 	
-	public MovieVO get(  int id ) {
-		MovieVO movieVO = null;
+	public BookVo get(  Long no ) {
+		BookVo bookVo = null;
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -100,24 +104,28 @@ public class MovieDao {
 			
 			//3. Statement 준비
 			String sql =
-					"      SELECT a.id " +
-					"       FROM movie a" +
-					" where a.id=?"		;
+					"      SELECT a.no, a.title, IF( a.state = 'rent', '대여중', '재고있음' ), b.name" +
+					"       FROM book a, author b" +
+                    "     WHERE a.author_no = b.no" +
+					"         AND a.no = ?";
 			pstmt = conn.prepareStatement( sql );
 			
 			//4. bind
-			pstmt.setInt( 1, id );
+			pstmt.setLong( 1, no );
 			
 			//5. SQL 실행
 			rs = pstmt.executeQuery();
 			if( rs.next() ) {
-				int no = rs.getInt( 1 );
+				Long no2 = rs.getLong( 1 );
 				String title = rs.getString( 2 );
-				int seats_left = rs.getInt( 3 );
-				movieVO = new MovieVO();
-				movieVO.setId( no );
-				movieVO.setTitle( title );
-				movieVO.setSeats_left( seats_left );
+				String state = rs.getString( 3 );
+				String authorName = rs.getString( 4 );
+				
+				bookVo = new BookVo();
+				bookVo.setNo( no2 );
+				bookVo.setTitle( title );
+				bookVo.setState( state );
+				bookVo.setAuthorName( authorName );				
 			}
 			
 		} catch( SQLException ex ) {
@@ -139,11 +147,11 @@ public class MovieDao {
 			}
 		}
 		
-		return movieVO;
+		return bookVo;
 	}
 	
-	public List<MovieVO> getList() {
-		List<MovieVO> list = new ArrayList<MovieVO>();
+	public List<BookVo> getList() {
+		List<BookVo> list = new ArrayList<BookVo>();
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
@@ -151,21 +159,24 @@ public class MovieDao {
 			conn = getConnection();
 			stmt = conn.createStatement();
 			String sql =
-					"      SELECT a.id, a.title, a.seats_left" +
-					"       FROM movie a" +
-                    " ORDER BY a.id ASC";
+					"      SELECT a.no, a.title, IF( a.state = 'rent', '대여중', '재고있음' ), b.name" +
+					"       FROM book a, author b" +
+                    "     WHERE a.author_no = b.no" +
+                    " ORDER BY a.no ASC";
 			rs = stmt.executeQuery( sql );
 			while( rs.next() ) {
-				int id = rs.getInt( 1 );
+				Long no = rs.getLong( 1 );
 				String title = rs.getString( 2 );
-				int seats_left = rs.getInt( 3 );
+				String state = rs.getString( 3 );
+				String authorName = rs.getString( 4 );
 				
-				MovieVO movieVO = new MovieVO();
-				movieVO.setId(id);
-				movieVO.setTitle(title);
-				movieVO.setSeats_left(seats_left);
+				BookVo bookVo = new BookVo();
+				bookVo.setNo(no);
+				bookVo.setTitle(title);
+				bookVo.setState(state);
+				bookVo.setAuthorName(authorName);
 				
-				list.add( movieVO );
+				list.add( bookVo );
 			}
 			
 		} catch( SQLException ex ) {

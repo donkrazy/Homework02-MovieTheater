@@ -1,15 +1,17 @@
-package com.estsoft.movieTheater.dao;
+package com.estsoft.bookshop.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.estsoft.movieTheater.vo.MovieVO;
-import com.estsoft.movieTheater.vo.PersonVO;
+import com.estsoft.bookshop.vo.AuthorVo;
 
-public class PersonDao {
+public class AuthorDao {
 	
 	private Connection getConnection() throws SQLException {
 		Connection conn = null;
@@ -28,26 +30,65 @@ public class PersonDao {
 		return conn;
 	}
 	
-	public void insert(String phone_num){
-		PersonVO personVO = new PersonVO();
+	public List<AuthorVo> getList() {
+		List<AuthorVo> list = new ArrayList<AuthorVo>();
 		
-		PersonDao personDao = new PersonDao();
-		personVO.setPhone_num( phone_num );
-		personDao.insert( personVO );
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = getConnection();
+			
+			//3. Statement 생성
+			stmt = conn.createStatement();
+			
+			//4. SQL 실행
+			String sql = "select no, name from author";
+			rs = stmt.executeQuery( sql );
+			
+			// 5. 데이터 받아오기 
+			while( rs.next() ) {
+				Long no = rs.getLong( 1 );
+				String name = rs.getString( 2 );
+				
+				AuthorVo authorVo = new AuthorVo();
+				authorVo.setNo(no);
+				authorVo.setName(name);
+				
+				list.add( authorVo );
+			}
+		} catch( SQLException ex ) {
+			System.out.println( "SQL 오류:" + ex );
+		} finally {
+			try {
+				if( rs != null ) {
+					rs.close();
+				}
+				if( stmt != null ) {
+					stmt.close();
+				}
+				if( conn != null ) {
+					conn.close();
+				}
+			} catch( SQLException ex ) {
+				ex.printStackTrace();
+			}
+		}
+		return list;
 	}
 	
-	public void insert( PersonVO personVO ) {
+	public void insert( AuthorVo authorVo ) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
 			conn = getConnection();
 			
 			//3. Statement 준비
-			String sql = "insert into person values(  null, ? )";
+			String sql = "insert into author values(  null, ? )";
 			pstmt = conn.prepareStatement(sql);
 			
 			//4. bind
-			pstmt.setString( 1, personVO.getPhone_num() );
+			pstmt.setString( 1, authorVo.getName() );
 			
 			//5. SQL 실행
 			pstmt.executeUpdate();
@@ -67,49 +108,5 @@ public class PersonDao {
 				ex.printStackTrace();
 			}
 		}		
-	}
-	
-	public int getIdByPhone_num( String phone_num ) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		try {
-			conn = getConnection();
-			
-			//3. Statement 준비
-			String sql =
-					"      SELECT a.id " +
-					"       FROM person a" +
-					" where a.phone_num=?"		;
-			pstmt = conn.prepareStatement( sql );
-			
-			//4. bind
-			pstmt.setString( 1, phone_num );
-			
-			//5. SQL 실행
-			rs = pstmt.executeQuery();
-			if( rs.next() ) {
-				int no = rs.getInt( 1 );
-				return no;
-			}
-		} catch( SQLException ex ) {
-			System.out.println( "SQL 오류:" + ex );
-		} finally {
-			//6. 자원정리(clean-up)
-			try {
-				if( rs != null ) {
-					rs.close();
-				}
-				if( pstmt != null ) {
-					pstmt.close();
-				}
-				if( conn != null ) {
-					conn.close();
-				}
-			} catch( SQLException ex ) {
-				ex.printStackTrace();
-			}
-		}
-		return 0;
 	}
 }
