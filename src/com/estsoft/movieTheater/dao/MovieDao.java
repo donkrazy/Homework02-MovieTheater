@@ -1,7 +1,6 @@
 package com.estsoft.movieTheater.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,30 +11,12 @@ import java.util.List;
 import com.estsoft.movieTheater.vo.MovieVO;
 
 public class MovieDao {
-	
-	private Connection getConnection() throws SQLException {
-		Connection conn = null;
-		try {
-			//1. 드라이버 로드
-			Class.forName( "com.mysql.jdbc.Driver" );
-
-			//2. Connection 얻기
-			String url = "jdbc:mysql://localhost/webdb";
-			conn = DriverManager.getConnection( url, "webdb", "webdb" );
-			
-		} catch (ClassNotFoundException ex) {
-			System.out.println( "드라이버를 찾을 수 없습니다:" + ex );
-		} 
-		
-		return conn;
-	}
-	
 	public void updateState( MovieVO movieVO ) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
-			String sql = "UPDATE movie SET seats_left = ? WHERE no = ?";
+			conn = Utils.getConnection();
+			String sql = "UPDATE movie SET seats_left = ? WHERE id = ?";
 			pstmt = conn.prepareStatement( sql );
 			pstmt.setInt( 1, movieVO.getSeats_left() );
 			pstmt.setInt( 2, movieVO.getId() );
@@ -61,7 +42,7 @@ public class MovieDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+			conn = Utils.getConnection();
 			
 			//3. Statement 준비
 			String sql = "insert into movie values(  null, ?, 200 )";
@@ -96,11 +77,11 @@ public class MovieDao {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
+			conn = Utils.getConnection();
 			
 			//3. Statement 준비
 			String sql =
-					"      SELECT a.id " +
+					"      SELECT *" +
 					"       FROM movie a" +
 					" where a.id=?"		;
 			pstmt = conn.prepareStatement( sql );
@@ -138,7 +119,6 @@ public class MovieDao {
 				ex.printStackTrace();
 			}
 		}
-		
 		return movieVO;
 	}
 	
@@ -148,7 +128,7 @@ public class MovieDao {
 		Statement stmt = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
+			conn = Utils.getConnection();
 			stmt = conn.createStatement();
 			String sql =
 					"      SELECT a.id, a.title, a.seats_left" +

@@ -13,17 +13,16 @@ import com.estsoft.movieTheater.vo.MovieVO;
 public class Main {
 	
 	static BufferedReader br = new BufferedReader( new InputStreamReader( System.in ) ) ;
-	static TicketingSystem ts = new TicketingSystem();
 	
 	public static void main(String[] args) {		
 		while(true)	{
 			try	{
 				System.out.print(
 				"\n== Ticketing System ==\n"+
-				"1. Reserve\n"+
-				"2. Cancel\n"+
-				"3. Count\n"+
-				"4. exit\n"+
+				"1. 예매 \n"+
+				"2. 예매취소\n"+
+				"3. 영화/잔여좌석수 확인\n"+
+				"4. 종료\n"+
 				"> " );
 				
 				String kind = br.readLine();
@@ -33,7 +32,7 @@ public class Main {
 						doReserve(); 
 						break;
 					case 2: 
-						doCancel(); 
+						//doCancel(); 
 						break;
 					case 3: 
 						doCount(); 
@@ -76,24 +75,21 @@ public class Main {
 		}
 	}
 	
-	static void doCancel() throws IOException {
-		System.out.println("Your name: ");
-		String name = br.readLine();
-		if(ts.cancelReservation(name)){
-			System.out.println("Cancelled.");
-		}
-		else{
-			System.out.println("NOT found");
-		}
-	}
-	
+//	// TODO	
+//	static void doCancel() throws IOException {
+//		System.out.println("Your name: ");
+//		String name = br.readLine();
+//		if(ts.cancelReservation(name)){
+//			System.out.println("Cancelled.");
+//		}
+//		else{
+//			System.out.println("NOT found");
+//		}
+//	}
+//	
+
+	//	TODO
 	static void doCount() throws IOException {
 		printMovieListMenu( "Count" );
-		String id = br.readLine() ;
-		if(Integer.parseInt(id) <= 3) {
-			System.out.println( "Reserved count: " + ts.reservedCount( Integer.parseInt( id ) ) );
-		} else {
-			System.out.println( "Invalid movie ID." );
-		}
 	}
 }

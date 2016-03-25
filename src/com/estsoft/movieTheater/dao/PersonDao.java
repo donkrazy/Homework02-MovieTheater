@@ -1,46 +1,34 @@
 package com.estsoft.movieTheater.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.estsoft.movieTheater.vo.MovieVO;
 import com.estsoft.movieTheater.vo.PersonVO;
 
 public class PersonDao {
 	
-	private Connection getConnection() throws SQLException {
-		Connection conn = null;
-		try {
-			//1. 드라이버 로드
-			Class.forName( "com.mysql.jdbc.Driver" );
 
-			//2. Connection 얻기
-			String url = "jdbc:mysql://localhost/webdb";
-			conn = DriverManager.getConnection(url, "webdb", "webdb");
-			
-		} catch (ClassNotFoundException ex) {
-			System.out.println( "드라이버를 찾을 수 없습니다:" + ex );
-		} 
-		
-		return conn;
-	}
-	
 	public void insert(String phone_num){
-		PersonVO personVO = new PersonVO();
-		
-		PersonDao personDao = new PersonDao();
-		personVO.setPhone_num( phone_num );
-		personDao.insert( personVO );
+		if(getIdByPhone_num(phone_num) != 0){
+			System.out.println(getIdByPhone_num(phone_num));
+			return;
+		}
+		else if(getIdByPhone_num(phone_num) == 0){
+			PersonVO personVO = new PersonVO();
+			PersonDao personDao = new PersonDao();
+			personVO.setPhone_num( phone_num );
+			personDao.insert( personVO );
+			return;
+		}
 	}
 	
 	public void insert( PersonVO personVO ) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try {
-			conn = getConnection();
+			conn = Utils.getConnection();
 			
 			//3. Statement 준비
 			String sql = "insert into person values(  null, ? )";
@@ -74,7 +62,7 @@ public class PersonDao {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			conn = getConnection();
+			conn = Utils.getConnection();
 			
 			//3. Statement 준비
 			String sql =

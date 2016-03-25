@@ -25,7 +25,6 @@ public class MovieVO {
 	}
 	@Override
 	public String toString() {
-		return id +"/" + title + "/" + seats_left;
-	}
-	
+		return id +")" + title + " " + seats_left + "석 남음";
+	}	
 }
