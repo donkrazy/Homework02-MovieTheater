@@ -35,6 +35,8 @@ public class ReservationVO {
 		return "ReservationVO [id=" + id + ", id_person=" + id_person + ", id_movie=" + id_movie + ", seats=" + seats
 				+ "]";
 	}
-	
+	public void printInfo(){
+        System.out.println(id_movie + "번 영화 ");
+    }
 
 }
