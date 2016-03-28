@@ -20,28 +20,26 @@ public class Main {
                         "\n== Ticketing System ==\n" +
                                 "1. 영화목록 확인\n" +
                                 "2. 예매 \n" +
-                                "3. 예매 확인\n" +
-                                "4. 예매 취소\n" +
-                                "5. 종료\n" +
+                                "3. 예매 확인 및 취소\n" +
+                                "4. 종료\n" +
                                 "> ");
                 String kind = br.readLine();
-                switch (Integer.parseInt(kind)) {
-                    case 1:
+                
+                switch (kind) {
+                    case "1":
                         doCount();
                         break;
-                    case 2:
+                    case "2":
                         doReserve();
                         break;
-                    case 3:
+                    case "3":
                         doLogin();
                         break;
-                    case 4:
-                        //doCancel();
-                        break;
-                    case 5:
+                    case "4":
+                    	System.out.println("ㅂㅂ");
                         System.exit(0);
                     default:
-                        System.out.println("\n Wrong.\n\n");
+                        System.out.println("다시 입력해주세요");
                 }
             } catch (IOException ie) {
                 System.out.println("Incorrect input.");
@@ -80,7 +78,6 @@ public class Main {
         }
     }
 
-    // TODO
     static void doLogin() throws IOException {
         System.out.print("Your name: ");
         PersonDao personDao = new PersonDao();
@@ -92,8 +89,15 @@ public class Main {
         }
         System.out.println("======" + name + " 님의 예약 목록========");
         reservationDao.printReservationListByPerson_id(person_id);
-        System.out.println("계속 진행하려면 엔터를 누르세요");
-        br.readLine();
+        System.out.println("예약을 취소하려면 y키를 누르세요");
+        System.out.println("초기 화면으로 돌아가려면 엔터를 누르세요");
+        String input = br.readLine();
+        if (input.equals("y") || input.equals("Y") ){
+        	System.out.println("취소하고자 하는 티켓의 번호를 입력하세요");
+        	String reservation_id = br.readLine();
+        	reservationDao.delete(Integer.valueOf(reservation_id));
+        	System.out.println( "취소되었습니다.");
+        }
     }
 
     static void doCount() throws IOException {

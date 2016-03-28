@@ -9,8 +9,8 @@ public class Utils {
             //1. 드라이버 로드
             Class.forName("com.mysql.jdbc.Driver");
             //2. Connection 얻기
-            String url = "jdbc:mysql://localhost:3306/mydb";
-            conn = DriverManager.getConnection(url, "root", "00000");
+            String url = "jdbc:mysql://localhost:3306/webdb";
+            conn = DriverManager.getConnection(url, "webdb", "webdb");
 
         } catch (ClassNotFoundException ex) {
             System.out.println("드라이버를 찾을 수 없습니다:" + ex);

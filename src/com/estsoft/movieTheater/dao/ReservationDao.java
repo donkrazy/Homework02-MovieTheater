@@ -27,9 +27,9 @@ public class ReservationDao {
             String sql = "insert into reservation values( null, ?, ?, ? )";
             pstmt = conn.prepareStatement(sql);
             //4. bind
-            pstmt.setInt(1, reservationVO.getSeats());
-            pstmt.setInt(2, reservationVO.getId_person());
-            pstmt.setInt(3, reservationVO.getId_movie());
+            pstmt.setInt(1, reservationVO.getId_person());
+            pstmt.setInt(2, reservationVO.getId_movie());
+            pstmt.setInt(3, reservationVO.getSeats());
             //잔여 좌석 count--
             MovieDao movieDao = new MovieDao();
             MovieVO movieVO = movieDao.get(reservationVO.getId_movie());
@@ -79,21 +79,21 @@ public class ReservationDao {
     }
 
     public void printReservationListByPerson_id(int person_id) {
-        List<ReservationVO> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         try {
             conn = Utils.getConnection();
-            String sql = "SELECT m.title, a.seats FROM reservation a, movie m " +
+            String sql = "SELECT a.id, m.title, a.seats FROM reservation a, movie m " +
                         "WHERE a.id_person = ? AND m.id=a.id_movie ORDER BY a.id ASC";
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, person_id);
             rs = pstmt.executeQuery();
             while (rs.next()) {
-                String title = rs.getString(1);
-                int seats = rs.getInt(2);
-                System.out.println(title + ": " +  seats + "석");
+            	int reservation_id = rs.getInt(1);
+                String title = rs.getString(2);
+                int seats = rs.getInt(3);
+                System.out.println( "["+ reservation_id + "]" +title + ": " +  seats + "석");
             }
         } catch (SQLException ex) {
             System.out.println("error : " + ex);
@@ -101,4 +101,26 @@ public class ReservationDao {
             Utils.clean_up(conn, pstmt, rs);
         }
     }
+    
+    public ReservationVO delete(int reservation_id){
+    	  ReservationVO reservationVO = null;
+          Connection conn = null;
+          PreparedStatement pstmt = null;
+          ResultSet rs = null;
+          try {
+              conn = Utils.getConnection();
+              //3. Statement 준비
+              String sql = "DELETE FROM reservation where id=?";
+              pstmt = conn.prepareStatement( sql );
+              //4. bind
+              pstmt.setInt( 1, reservation_id );
+              //5. SQL 실행
+              pstmt.executeUpdate();
+          } catch( SQLException ex ) {
+              System.out.println( "SQL 오류:" + ex );
+          } finally {
+              Utils.clean_up(conn, pstmt, rs);
+          }
+          return reservationVO;
+     }
 }
